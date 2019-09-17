@@ -5,7 +5,7 @@ Registration module main code.
 import numpy as np
 from scipy import ndimage
 import registration_util as util
-
+from math import sin, cos, pi
 
 # SECTION 1. Geometrical transformations
 
@@ -43,6 +43,7 @@ def rotate(phi):
     # TODO: Implement transformation matrix for rotation.
     #------------------------------------------------------------------#
 
+    T = [[cos(phi), -sin(phi)],[sin(phi), cos(phi)]]
     return T
 
 
@@ -57,7 +58,7 @@ def shear(cx, cy):
     #------------------------------------------------------------------#
     # TODO: Implement transformation matrix for shear.
     #------------------------------------------------------------------#
-
+    T = [[1,cx],[cy,1]]
     return T
 
 
@@ -73,7 +74,8 @@ def reflect(rx, ry):
     if rx not in allowed or ry not in allowed:
         T = 'Invalid input parameter'
         return T
-
+    else:
+        T = [[rx,0],[0,ry]]
     #------------------------------------------------------------------#
     # TODO: Implement transformation matrix for reflection
     #------------------------------------------------------------------#
@@ -109,6 +111,7 @@ def image_transform(I, Th,  output_shape=None):
 
     # convert to a 2-by-p matrix (p is the number of pixels)
     X = np.concatenate((xx.reshape((1, xx.size)), yy.reshape((1, yy.size))))
+
     # convert to homogeneous coordinates
     Xh = util.c2h(X)
 
@@ -116,6 +119,7 @@ def image_transform(I, Th,  output_shape=None):
     # TODO: Perform inverse coordinates mapping.
     #------------------------------------------------------------------#
 
+    Xt = np.linalg.inv(Th).dot(Xh)
     It = ndimage.map_coordinates(I, [Xt[1,:], Xt[0,:]], order=1, mode='constant').reshape(I.shape)
 
     return It, Xt

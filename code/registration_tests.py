@@ -8,16 +8,15 @@ import registration as reg
 import registration_util as util
 from IPython.display import display, clear_output
 
-
 # SECTION 1. Geometrical transformations
 
 def transforms_test():
 
     X = util.test_object(1)
 
-    X_rot = reg.rotate(3*np.pi/4).dot(X)
-    X_shear = reg.shear(0.1, 0.2).dot(X)
-    X_reflect = reg.reflect(-1, -1).dot(X)
+    X_rot = np.dot(reg.rotate(3*np.pi/4) , X)
+    X_shear = np.dot(reg.shear(0.1, 0.2), X)
+    X_reflect = np.dot(reg.reflect(-1, -1) , X)
 
     fig = plt.figure(figsize=(12,5))
     ax1 = fig.add_subplot(141, xlim=(-4,4), ylim=(-4,4))
@@ -40,7 +39,7 @@ def transforms_test():
     ax3.grid()
     ax4.grid()
 
-
+    plt.show()
 def combining_transforms():
 
     X = util.test_object(1)
@@ -48,7 +47,8 @@ def combining_transforms():
     #------------------------------------------------------------------#
     # TODO: Experiment with combining transformation matrices.
     #------------------------------------------------------------------#
-
+    
+    
 
 def t2h_test():
 
@@ -70,7 +70,7 @@ def t2h_test():
     util.plot_object(ax1, X)
     util.plot_object(ax1, X_rot_tran)
     ax1.grid()
-
+    plt.show()
 
 def arbitrary_rotation():
 
@@ -80,6 +80,12 @@ def arbitrary_rotation():
     #------------------------------------------------------------------#
     # TODO: TODO: Perform rotation of the test shape around the first vertex
     #------------------------------------------------------------------#
+    tdown = X[:,0] * -1
+    tup = X[:, 0]
+    tdown = util.t2h(reg.identity(), tdown)
+    tup = util.t2h(reg.identity(), tup)
+    r = util.t2h(reg.rotate(45), [0,0])
+    T = tup.dot(r.dot(tdown))
 
     X_rot = T.dot(Xh)
 
@@ -89,13 +95,13 @@ def arbitrary_rotation():
     util.plot_object(ax1, X_rot)
     ax1.set_xlim(ax1.get_ylim())
     ax1.grid()
-
+    plt.show()
 
 # SECTION 2. Image transformation and least squares fitting
 
 def image_transform_test():
 
-    I = plt.imread('../data/cameraman.tif')
+    I = plt.imread('8dc00-mia/data/cameraman.tif')
 
     # 45 deg. rotation around the image center
     T_1 = util.t2h(reg.identity(), 128*np.ones(2))
@@ -131,15 +137,17 @@ def image_transform_test():
     ax2.set_title('Shearing')
     ax3.set_title('Scaling')
 
+    plt.show()
 
 def ls_solve_test():
     #------------------------------------------------------------------#
     # TODO: Test your implementation of the ls_solve definition
     # remove the 'pass' once implemented
-    pass
     #------------------------------------------------------------------#
-
-
+    A = np.transpose(np.array([[3,4],[5,6],[7,8],[17,10]]))
+    B = [1,2,3,4]
+    print(reg.ls_solve(A, B))
+    
 def ls_affine_test():
 
     X = util.test_object(1)
@@ -182,7 +190,7 @@ def ls_affine_test():
 
 def correlation_test():
 
-    I = plt.imread('../data/cameraman.tif')
+    I = plt.imread('8dc00-mia/data/cameraman.tif')
     Th = util.t2h(reg.identity(), np.array([10,20]))
     J, _ = reg.image_transform(I, Th)
 
@@ -199,7 +207,7 @@ def correlation_test():
 
 def mutual_information_test():
 
-    I = plt.imread('../data/cameraman.tif')
+    I = plt.imread('8dc00-mia/data/cameraman.tif')
 
     # mutual information of an image with itself
     p1 = reg.joint_histogram(I, I)
@@ -214,7 +222,7 @@ def mutual_information_test():
 
 def mutual_information_e_test():
 
-    I = plt.imread('../data/cameraman.tif')
+    I = plt.imread('8dc00-mia/data/cameraman.tif')
 
     N1 = np.random.randint(255, size=(512, 512))
     N2 = np.random.randint(255, size=(512, 512))
